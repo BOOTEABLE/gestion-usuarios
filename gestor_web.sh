@@ -69,28 +69,39 @@ EOF
 
     sudo systemctl restart vsftpd
 
-    echo "Usuario creado: $NEW_USER"
-    echo "Contraseña: $PASSWORD"
-    echo "Base de datos creada: $DB_NAME"
-    echo "Accede en: http://$DOMAIN/~$NEW_USER/"
+    echo -e "\n\033[1;32m✅ Usuario creado exitosamente:\033[0m"
+    echo -e "\033[1;34m👤 Usuario:\033[0m $NEW_USER"
+    echo -e "\033[1;34m🔑 Contraseña:\033[0m $PASSWORD"
+    echo -e "\033[1;34m📊 Base de datos:\033[0m $DB_NAME"
+    echo -e "\033[1;34m🌍 Sitio web:\033[0m http://$DOMAIN/~$NEW_USER/"
+    echo -e "\033[1;32m-------------------------------------------\033[0m"    
 }
 
 eliminar_usuario() {
     echo "Ingresa el nombre del usuario a eliminar (ejemplo: usuario01):"
     read USUARIO_ELIMINAR
-
+    # Eliminar base de datos y usuario de MySQL
     sudo mysql -e "DROP DATABASE db_$USUARIO_ELIMINAR;"
     sudo mysql -e "DROP USER '$USUARIO_ELIMINAR'@'localhost';"
-
+    sudo mysql -e "FLUSH PRIVILEGES;"
+    
+    # Eliminar el directorio del usuario
     sudo rm -rf "$BASE_DIR/$USUARIO_ELIMINAR"
-
-    # Si usaras configuración individual por usuario:
+    # Eliminar usuario del sistema
+    sudo userdel "$USUARIO_ELIMINAR"
+    # Eliminar el grupo si existe
+    if getent group "$USUARIO_ELIMINAR" > /dev/null; then
+        sudo groupdel "$USUARIO_ELIMINAR"
+    fi
+    
+    # Eliminar archivos de configuración personalizados de nginx si se usaran
     sudo rm -f "/etc/nginx/sites-available/$USUARIO_ELIMINAR"
     sudo rm -f "/etc/nginx/sites-enabled/$USUARIO_ELIMINAR"
-
+    # Reiniciar nginx
     sudo systemctl reload nginx
-
-    echo "Usuario $USUARIO_ELIMINAR eliminado correctamente."
+    echo -e "\n\033[1;31m❌ El usuario ha sido eliminado correctamente:\033[0m"
+    echo -e "\033[1;34m👤 Usuario eliminado:\033[0m $USUARIO_ELIMINAR"
+    echo -e "\033[1;32m-------------------------------------------\033[0m"    
 }
 
 # Menú principal
