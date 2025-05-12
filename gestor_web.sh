@@ -54,7 +54,7 @@ server {
         root /usr/share/;
         index index.php index.html index.htm;
 
-        location ~ ^/phpmyadmin/(.+\.php)$ {
+        location ~ ^/phpmyadmin/(.*\.php)$ {
             try_files $uri =404;
             fastcgi_pass unix:/run/php/php8.1-fpm.sock;
             fastcgi_index index.php;
@@ -73,7 +73,8 @@ EOF
 
     sudo nginx -t && sudo systemctl reload nginx
 
-    sudo chown -R www-data:www-data "$BASE_DIR/$NEW_USER/$HTML_DIR"
+    sudo chown -R $NEW_USER:www-data "$BASE_DIR/$NEW_USER/$HTML_DIR"
+
     sudo chmod -R 755 "$BASE_DIR/$NEW_USER/$HTML_DIR"
     sudo chmod 755 "$BASE_DIR/$NEW_USER"
 
@@ -122,7 +123,7 @@ eliminar_usuario() {
 }
 
 # Menú principal
-echo "Seleccione una opción:"
+echo "Seleccione una opción: este es del github"
 echo "1. Crear usuario"
 echo "2. Eliminar usuario"
 read OPCION
